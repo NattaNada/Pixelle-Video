@@ -162,7 +162,9 @@
             margin: 0;
         }
 
-        /* Label episode kecil di bawah (teks statis, bukan branding) */
+        /* Label episode kecil di bawah (parameter template, bukan
+           branding) — nilai default "Serial Oyen — Episode 1";
+           assembler meneruskan episode_label dari label.txt. */
         .episode-label {
             background-color: rgba(255, 255, 255, 0.85);
             padding: 10px 28px;
@@ -286,9 +288,10 @@
         <p>{{text}}</p>
     </div>
 
-    <!-- Label episode -->
+    <!-- Label episode (parameter template {{episode_label}},
+         default "Serial Oyen — Episode 1") -->
     <div class="episode-label">
-        <span>Serial Oyen &mdash; Episode 1</span>
+        <span>{{episode_label=Serial Oyen — Episode 1}}</span>
     </div>
 </body>
 </html>
