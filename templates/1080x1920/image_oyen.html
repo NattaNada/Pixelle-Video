@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="template:media-width" content="1024">
+    <meta name="template:media-height" content="576">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Comic Sans MS', 'Marker Felt', 'Arial Rounded MT Bold', sans-serif;
+        }
+
+        /* Latar hangat krem-oranye (solid + pola titik halus, TANPA gambar eksternal):
+           di v2 background hitam karena gambar background eksternal template
+           (https://lmg.jj20.com/...) tidak ke-load dari VM dan tidak ada
+           warna fallback. Template ini murni CSS, jadi selalu tampil. */
+        body {
+            width: 1080px;
+            height: 1920px;
+            background-color: #FFE8C2;
+            background-image:
+                radial-gradient(circle, rgba(255, 190, 110, 0.35) 9px, transparent 10px),
+                radial-gradient(circle, rgba(255, 190, 110, 0.22) 9px, transparent 10px);
+            background-size: 96px 96px;
+            background-position: 0 0, 48px 48px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            gap: 36px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Dekorasi kartun (sama seperti image_cartoon.html) */
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .cloud:before, .cloud:after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 50%;
+        }
+
+        .cloud-1 {
+            width: 120px;
+            height: 60px;
+            top: 4%;
+            left: 4%;
+        }
+
+        .cloud-1:before {
+            width: 70px;
+            height: 70px;
+            top: -30px;
+            left: 10px;
+        }
+
+        .cloud-1:after {
+            width: 50px;
+            height: 50px;
+            top: -20px;
+            right: 10px;
+        }
+
+        .cloud-2 {
+            width: 150px;
+            height: 70px;
+            bottom: 5%;
+            right: 4%;
+        }
+
+        .cloud-2:before {
+            width: 80px;
+            height: 80px;
+            top: -35px;
+            left: 15px;
+        }
+
+        .cloud-2:after {
+            width: 60px;
+            height: 60px;
+            top: -25px;
+            right: 20px;
+        }
+
+        /* Judul */
+        .title-container {
+            background-color: rgba(255, 255, 255, 0.92);
+            padding: 20px 40px;
+            border-radius: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            border: 5px solid #FF9ED8;
+            max-width: 90%;
+            position: relative;
+            z-index: 10;
+        }
+
+        .title-container h1 {
+            font-size: 54px;
+            color: #FF5BAE;
+            text-shadow: 3px 3px 0 #FFC2E9;
+            margin: 0;
+        }
+
+        /* Slot gambar 16:9 — 1040x585 (lebar penuh kanvas minus padding).
+           Panel Oyen 1132x639 (rasio 1,7715) vs slot 1,7778: dengan
+           object-fit: contain panel tampil UTUH tanpa crop, sisa pita
+           hanya ~2px di kiri-kanan (tidak terlihat). Di v2 slot-nya
+           kartu persegi 1024x1024 sehingga ada pita putih ~475px. */
+        .image-container {
+            width: 1040px;
+            height: 585px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 8px solid #A6E3FF;
+            overflow: hidden;
+            position: relative;
+            z-index: 10;
+        }
+
+        .image-container img {
+            width: 100%;
+            height: 100%;
+            border-radius: 15px;
+            object-fit: contain;
+        }
+
+        /* Subtitle */
+        .caption-container {
+            background-color: rgba(255, 255, 255, 0.92);
+            padding: 25px 40px;
+            border-radius: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            border: 5px solid #B5FFA6;
+            max-width: 90%;
+            position: relative;
+            z-index: 10;
+        }
+
+        .caption-container p {
+            font-size: 38px;
+            color: #5BAE5B;
+            line-height: 1.4;
+            text-shadow: 2px 2px 0 #C2FFC2;
+            margin: 0;
+        }
+
+        /* Label episode kecil di bawah (teks statis, bukan branding) */
+        .episode-label {
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 10px 28px;
+            border-radius: 999px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            border: 3px solid #FFB347;
+            position: relative;
+            z-index: 10;
+        }
+
+        .episode-label span {
+            font-size: 28px;
+            color: #E8890C;
+            margin: 0;
+        }
+
+        /* Dekorasi */
+        .decoration {
+            position: absolute;
+            z-index: 5;
+        }
+
+        .star {
+            width: 30px;
+            height: 30px;
+            background-color: #FFF9A6;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+
+        .star-1 {
+            top: 8%;
+            right: 8%;
+            transform: rotate(15deg);
+        }
+
+        .star-2 {
+            bottom: 10%;
+            left: 6%;
+            transform: rotate(-10deg);
+            width: 40px;
+            height: 40px;
+        }
+
+        .heart {
+            width: 40px;
+            height: 40px;
+            background-color: #FF9ED8;
+            transform: rotate(-45deg);
+            position: absolute;
+        }
+
+        .heart:before, .heart:after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            background-color: #FF9ED8;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        .heart:before {
+            top: -20px;
+            left: 0;
+        }
+
+        .heart:after {
+            top: 0;
+            left: 20px;
+        }
+
+        .heart-1 {
+            top: 6%;
+            left: 10%;
+        }
+
+        .heart-2 {
+            bottom: 8%;
+            right: 10%;
+            width: 30px;
+            height: 30px;
+        }
+
+        .heart-2:before, .heart-2:after {
+            width: 30px;
+            height: 30px;
+        }
+
+        .heart-2:before {
+            top: -15px;
+        }
+
+        .heart-2:after {
+            left: 15px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Dekorasi -->
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+
+    <div class="decoration star star-1"></div>
+    <div class="decoration star star-2"></div>
+
+    <div class="decoration heart heart-1"></div>
+    <div class="decoration heart heart-2"></div>
+
+    <!-- Judul -->
+    <div class="title-container">
+        <h1>{{title}}</h1>
+    </div>
+
+    <!-- Gambar 16:9 -->
+    <div class="image-container">
+        <img src="{{image}}" alt="Panel Oyen">
+    </div>
+
+    <!-- Subtitle -->
+    <div class="caption-container">
+        <p>{{text}}</p>
+    </div>
+
+    <!-- Label episode -->
+    <div class="episode-label">
+        <span>Serial Oyen &mdash; Episode 1</span>
+    </div>
+</body>
+</html>
